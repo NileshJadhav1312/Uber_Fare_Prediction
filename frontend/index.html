@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UberFare AI — XGBoost Fare Predictor</title>
+  <meta name="description" content="Predict your Uber fare using a trained XGBoost machine learning model. Adjust ride parameters and estimate trip fare instantly." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="bg-blob blob-1" aria-hidden="true"></div>
+  <div class="bg-blob blob-2" aria-hidden="true"></div>
+  <div class="bg-blob blob-3" aria-hidden="true"></div>
+
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand">
+      <div class="nav-logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="14" cy="14" r="14" fill="url(#logoGrad)" />
+          <path d="M8 14L12 10L16 14L20 10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8 18L12 14L16 18L20 14" stroke="rgba(255,255,255,0.55)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="logoGrad" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#0d9488"/>
+              <stop offset="1" stop-color="#0284c7"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <span class="nav-title">UberFare <span class="brand-ai">AI</span></span>
+    </div>
+    <div class="nav-actions">
+      <div class="nav-badge">
+        <span class="pulse-dot" aria-hidden="true"></span>
+        XGBoost · R² 98.97%
+      </div>
+      <button type="button" id="reloadModelBtn" class="reload-btn" onclick="reloadModel()" title="Hot-reload model after retraining">
+        Reload Model
+      </button>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-content">
+      <div class="hero-tag">Trained XGBoost Model</div>
+      <h1 class="hero-title">
+        UberFare AI<br/>
+        <span class="gradient-text">Predict trip fare instantly</span>
+      </h1>
+      <p class="hero-sub">
+        Choose your ride details and get a fare estimate from the trained model.
+      </p>
+      <button type="button" class="select-details-btn" id="openDialogBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        Select Details
+      </button>
+
+      <div class="feature-grid" aria-label="Project highlights">
+        <div class="feature-chip">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>
+          </svg>
+          <span>98.97% Accuracy</span>
+        </div>
+        <div class="feature-chip">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+          <span>XGBoost Model</span>
+        </div>
+        <div class="feature-chip">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 19h16M4 15l4-5 4 3 6-8"/>
+          </svg>
+          <span>15+ Ride Factors</span>
+        </div>
+        <div class="feature-chip">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+          <span>Instant Results</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <section class="results-area" aria-label="Prediction results">
+      <div class="results-panel" id="resultsPanel" hidden>
+
+        <div class="fare-card glass-card" id="fareCard">
+          <div class="fare-header">
+            <div class="fare-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/>
+              </svg>
+              Predicted Fare
+            </div>
+            <span class="ride-badge" id="rideBadge">UberX</span>
+          </div>
+          <div class="fare-amount-wrap">
+            <span class="fare-currency">&#8377;</span>
+            <span class="fare-amount" id="fareAmount">--</span>
+          </div>
+          <div class="fare-range">
+            Expected range: <strong id="fareMin">&#8377;--</strong> – <strong id="fareMax">&#8377;--</strong>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Parameter Dialog -->
+  <div class="dialog-backdrop" id="dialogBackdrop" hidden>
+    <div class="dialog-box glass-card" id="paramDialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+      <div class="dialog-header">
+        <h2 class="panel-title" id="dialogTitle">
+          <span class="panel-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+            </svg>
+          </span>
+          Model Parameters
+        </h2>
+        <button type="button" class="dialog-close" id="closeDialogBtn" aria-label="Close dialog">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <form id="fareForm" novalidate>
+        <div class="form-sections">
+          <div class="form-section">
+            <h3 class="section-subtitle">Distance &amp; Duration</h3>
+            <div class="params-grid">
+              <div class="param-card">
+                <label class="param-label" for="distanceKm">Distance (km)</label>
+                <input type="number" id="distanceKm" class="param-input" value="15.0" min="0.1" step="0.5" required />
+              </div>
+              <div class="param-card">
+                <label class="param-label" for="durationMin">Duration (min)</label>
+                <input type="number" id="durationMin" class="param-input" value="25.0" min="1" step="1" required />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-subtitle">Vehicle &amp; Traffic</h3>
+            <div class="params-grid">
+              <div class="param-card">
+                <label class="param-label" for="vehicleType">Vehicle Type</label>
+                <select class="param-select" id="vehicleType">
+                  <option value="UberX" selected>UberX / Sedan</option>
+                  <option value="UberXL">UberXL / XL</option>
+                  <option value="Black">Uber Black</option>
+                  <option value="Comfort">Comfort</option>
+                  <option value="Go">Uber Go</option>
+                  <option value="Mini">Mini</option>
+                  <option value="Pool">Uber Pool</option>
+                  <option value="Premium">Premium</option>
+                  <option value="SUV">SUV</option>
+                  <option value="Bike">Bike</option>
+                  <option value="Auto">Auto / Rickshaw</option>
+                </select>
+              </div>
+              <div class="param-card">
+                <label class="param-label" for="trafficLevel">Traffic Level</label>
+                <select class="param-select" id="trafficLevel">
+                  <option value="0">0 - Low</option>
+                  <option value="1" selected>1 - Medium</option>
+                  <option value="2">2 - High</option>
+                  <option value="3">3 - Jam</option>
+                </select>
+              </div>
+              <div class="param-card">
+                <label class="param-label" for="roadType">Road Type</label>
+                <select class="param-select" id="roadType">
+                  <option value="City Road" selected>City Road (Urban)</option>
+                  <option value="Highway">Highway</option>
+                  <option value="Expressway">Expressway</option>
+                  <option value="Rural Road">Rural Road</option>
+                </select>
+              </div>
+              <div class="param-card">
+                <label class="param-label" for="stopsAdded">Stops Added</label>
+                <input type="number" id="stopsAdded" class="param-input" value="0" min="0" max="5" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-subtitle">Location &amp; Timing</h3>
+            <div class="params-grid">
+              <div class="param-card">
+                <label class="param-label" for="pickupArea">Pickup Area</label>
+                <select class="param-select" id="pickupArea">
+                  <option value="Residential" selected>Residential</option>
+                  <option value="Commercial">Commercial</option>
+                  <option value="IT Park">IT Park</option>
+                  <option value="Metro Station">Metro Station</option>
+                  <option value="Railway Station">Railway Station</option>
+                  <option value="Bus Stand">Bus Stand</option>
+                  <option value="Hospital">Hospital</option>
+                  <option value="College">College</option>
+                  <option value="Mall">Mall</option>
+                  <option value="Airport">Airport</option>
+                </select>
+              </div>
+              <div class="param-card">
+                <label class="param-label" for="dropArea">Drop-off Area</label>
+                <select class="param-select" id="dropArea">
+                  <option value="Commercial" selected>Commercial</option>
+                  <option value="Residential">Residential</option>
+                  <option value="IT Park">IT Park</option>
+                  <option value="Metro Station">Metro Station</option>
+                  <option value="Railway Station">Railway Station</option>
+                  <option value="Bus Stand">Bus Stand</option>
+                  <option value="Hospital">Hospital</option>
+                  <option value="College">College</option>
+                  <option value="Mall">Mall</option>
+                  <option value="Airport">Airport</option>
+                </select>
+              </div>
+              <div class="param-card">
+                <label class="param-label" for="timeSlot">Time Slot</label>
+                <select class="param-select" id="timeSlot">
+                  <option value="Morning Rush" selected>Morning Rush</option>
+                  <option value="Evening Rush">Evening Rush</option>
+                  <option value="Evening">Evening</option>
+                  <option value="Midday">Midday</option>
+                  <option value="Morning">Morning</option>
+                  <option value="Night">Night</option>
+                  <option value="Late Night">Late Night</option>
+                </select>
+              </div>
+              <div class="param-card">
+                <label class="param-label" for="dayType">Day Type</label>
+                <select class="param-select" id="dayType">
+                  <option value="0" selected>0 - Weekday</option>
+                  <option value="1">1 - Weekend</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-subtitle">Weather &amp; Events</h3>
+            <div class="params-grid">
+              <div class="param-card">
+                <label class="param-label" for="weatherCond">Weather</label>
+                <select class="param-select" id="weatherCond">
+                  <option value="0" selected>0 - Clear</option>
+                  <option value="1">1 - Cloudy</option>
+                  <option value="2">2 - Rain</option>
+                  <option value="3">3 - Storm</option>
+                </select>
+              </div>
+              <div class="param-card">
+                <label class="param-label" for="rainfall">Rainfall</label>
+                <select class="param-select" id="rainfall">
+                  <option value="0" selected>0 - None</option>
+                  <option value="1">1 - Light</option>
+                  <option value="2">2 - Heavy</option>
+                </select>
+              </div>
+              <div class="param-card">
+                <label class="param-label" for="tempLevel">Temperature</label>
+                <select class="param-select" id="tempLevel">
+                  <option value="0">0 - Cold</option>
+                  <option value="1">1 - Cool</option>
+                  <option value="2" selected>2 - Moderate</option>
+                  <option value="3">3 - Warm</option>
+                  <option value="4">4 - Hot</option>
+                </select>
+              </div>
+              <div class="param-card">
+                <label class="param-label" for="busyDay">Busy Day</label>
+                <select class="param-select" id="busyDay">
+                  <option value="Normal" selected>Normal</option>
+                  <option value="Major Event">Major Event</option>
+                  <option value="Public Holiday">Public Holiday</option>
+                  <option value="Festival">Festival</option>
+                </select>
+              </div>
+              <div class="param-card">
+                <label class="param-label" for="holiday">Holiday</label>
+                <select class="param-select" id="holiday">
+                  <option value="0" selected>0 - No</option>
+                  <option value="1">1 - Yes</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="cta-btn" id="calcBtn">
+          <span class="btn-inner">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+            <span id="calcBtnLabel">Predict Fare</span>
+          </span>
+          <span class="btn-shimmer" aria-hidden="true"></span>
+        </button>
+
+        <div class="error-banner" id="errorBanner" role="alert" aria-live="polite" hidden>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span id="errorMsg"></span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>Powered by <strong>XGBoost</strong> · R² Score: 98.97%</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
