@@ -1,5 +1,23 @@
 # UberFare AI — Ride Fare Prediction
 
+<div align="center">
+
+<a href="https://fareprediction-tlzr.onrender.com" target="_blank">
+  <img src="https://img.shields.io/badge/Live%20Demo-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white" alt="Live Demo on Render" />
+</a>
+<a href="https://fareprediction-tlzr.onrender.com" target="_blank">
+  <img src="https://img.shields.io/website?url=https%3A%2F%2Ffareprediction-tlzr.onrender.com&style=for-the-badge&label=App%20Status" alt="App Status" />
+</a>
+
+<p style="font-size:16px; margin-top:8px;">
+  🚀 <b>Live App:</b>
+  <a href="https://fareprediction-tlzr.onrender.com">https://fareprediction-tlzr.onrender.com</a>
+</p>
+
+</div>
+
+> **Note:** The app is hosted on Render's free tier, so it may take 30–60 seconds to wake up on the first request after a period of inactivity.
+
 Predict Uber-style trip fares with a trained **XGBoost** regressor. The project includes data analysis notebooks, model comparison, a Flask + glassmorphic web UI, and an optional Streamlit app.
 
 ---
@@ -183,6 +201,24 @@ port = 8501
 [browser]
 gatherUsageStats = false
 ```
+
+---
+
+## Deploy / run on Render
+
+The Flask app is live at **[fareprediction-tlzr.onrender.com](https://fareprediction-tlzr.onrender.com)**.
+
+To deploy your own copy:
+
+1. Push this repo to GitHub (include `models/*.pkl` or train in CI).
+2. Go to [https://render.com](https://render.com) → **New** → **Web Service**.
+3. Connect the repo and configure:
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `python src/app.py` (or `gunicorn src.app:app` for production)
+4. Add any needed environment variables in the Render dashboard.
+5. Deploy. Render assigns a public URL like `https://<your-app-name>.onrender.com`.
+
+> Free-tier Render services spin down after inactivity, so the first request after idling may be slow while the instance wakes up.
 
 ---
 
