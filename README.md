@@ -1,153 +1,228 @@
-# UberFare AI — Ride Fare Prediction
+# 🚖 UberFare AI — Ride Fare Prediction
 
 <div align="center">
 
-<a href="https://fareprediction-tlzr.onrender.com" target="_blank">
-  <img src="https://img.shields.io/badge/Live%20Demo-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white" alt="Live Demo on Render" />
-</a>
-<a href="https://fareprediction-tlzr.onrender.com" target="_blank">
-  <img src="https://img.shields.io/website?url=https%3A%2F%2Ffareprediction-tlzr.onrender.com&style=for-the-badge&label=App%20Status" alt="App Status" />
-</a>
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://fareprediction-tlzr.onrender.com)
+[![App Status](https://img.shields.io/website?url=https%3A%2F%2Ffareprediction-tlzr.onrender.com&style=for-the-badge&label=App%20Status)](https://fareprediction-tlzr.onrender.com)
 
-<p style="font-size:16px; margin-top:8px;">
-  🚀 <b>Live App:</b>
-  <a href="https://fareprediction-tlzr.onrender.com">https://fareprediction-tlzr.onrender.com</a>
-</p>
+### 🌐 Live Demo
+**https://fareprediction-tlzr.onrender.com**
+
+*The live application is built with **Flask** and hosted on **Render's Free Tier**. The first request may take **30–60 seconds** if the service is waking up.*
 
 </div>
 
-> **Note:** The app is hosted on Render's free tier, so it may take 30–60 seconds to wake up on the first request after a period of inactivity.
+---
 
-Predict Uber-style trip fares with a trained **XGBoost** regressor. The project includes data analysis notebooks, model comparison, a Flask + glassmorphic web UI, and an optional Streamlit app.
+# 📌 Overview
+
+UberFare AI is a machine learning project that predicts **Uber-style ride fares** using an **XGBoost Regressor**. The prediction considers multiple ride-related factors including:
+
+- 📍 Distance
+- ⏱ Trip Duration
+- 🚗 Vehicle Type
+- 🚦 Traffic Conditions
+- 🌦 Weather
+- 🏙 Pickup & Drop Area Type
+- 🕒 Time Slot
+- 📅 Holidays
+- 🛑 Number of Stops
+
+The project includes:
+
+- 📊 Exploratory Data Analysis (EDA)
+- 🤖 Multiple Regression Model Comparison
+- 🏆 Production-ready XGBoost Model
+- 🌐 Flask Web Application
+- 🎨 Glassmorphism UI
+- 📈 Streamlit App (Local Use)
 
 ---
 
-## About the project
+# 📊 Model Performance
 
-Urban ride fares depend on many interacting factors: distance, duration, vehicle category, traffic, weather, pickup/drop area types, time of day, and special events. This project:
+## ✅ Production Model (XGBoost)
 
-1. Cleans and explores a processed ride dataset (`data/processed_data.csv`)
-2. Trains and compares several regression models on the same train/test split
-3. Selects **XGBoost** as the only production model
-4. Serves predictions through a web UI (Flask) or Streamlit
-
-**Held-out test metrics (XGBoost):** R² ≈ **0.9897** · MAE ≈ **₹128** · RMSE ≈ **₹171**
-
----
-
-## Models tested
-
-| Model | Test R² | MAE (₹) | RMSE (₹) | Notes |
-|-------|---------|---------|----------|--------|
-| **XGBoost** (selected) | **0.9897** | **128.20** | **171.11** | Production model |
-| Ridge Regression | 0.9092 | 349.50 | 506.97 | Comparison only |
-| Linear Regression | 0.9092 | 349.80 | 506.98 | Comparison only |
-| Multiple Regression (OLS) | 0.9092 | 349.80 | 506.98 | Same fit as Linear |
-| Lasso Regression | 0.9083 | 349.79 | 509.62 | Comparison only |
-
-Training and comparison live in `notebooks/02_model_training.ipynb`.  
-**Only XGBoost is saved** (`models/xgboost_model.pkl` + `models/feature_columns.pkl`).
-
-### Why XGBoost was selected
-
-- Highest accuracy and lowest error by a wide margin (~9 R² points over linear models)
-- Captures non-linear interactions among the 49 encoded features
-- Produces valid positive fares on sample trips (linear models can predict negative Bike fares)
-- Stable 5-fold cross-validation R²
+| Metric | Score |
+|---------|-------|
+| **R² Score** | **0.9897** |
+| **MAE** | **₹128.20** |
+| **RMSE** | **₹171.11** |
 
 ---
 
-## Project structure
+# 🤖 Models Compared
 
-```
+| Model | Test R² | MAE (₹) | RMSE (₹) | Status |
+|------|------:|------:|------:|------|
+| ✅ XGBoost | **0.9897** | **128.20** | **171.11** | Production |
+| Ridge Regression | 0.9092 | 349.50 | 506.97 | Comparison |
+| Linear Regression | 0.9092 | 349.80 | 506.98 | Comparison |
+| Multiple Regression (OLS) | 0.9092 | 349.80 | 506.98 | Comparison |
+| Lasso Regression | 0.9083 | 349.79 | 509.62 | Comparison |
+
+---
+
+# ⭐ Why XGBoost?
+
+XGBoost was selected because it:
+
+- Achieved the highest prediction accuracy
+- Produced the lowest prediction error
+- Captures complex nonlinear relationships
+- Avoids negative fare predictions
+- Delivered stable 5-fold Cross Validation performance
+- Significantly outperformed linear models
+
+---
+
+# 📂 Project Structure
+
+```text
 fare_prediction/
+│
 ├── data/
-│   ├── input_dataset.csv          # Raw / source data
-│   └── processed_data.csv         # Model-ready features + Fare (Target)
+│   ├── input_dataset.csv
+│   └── processed_data.csv
+│
 ├── notebooks/
-│   ├── 01_data_analysis.ipynb     # EDA
-│   └── 02_model_training.ipynb    # Train, compare, save XGBoost only
+│   ├── 01_data_analysis.ipynb
+│   └── 02_model_training.ipynb
+│
 ├── models/
-│   ├── xgboost_model.pkl          # Production model
-│   └── feature_columns.pkl        # Feature schema (49 columns)
-├── frontend/                      # Glassmorphic UI (served by Flask)
+│   ├── xgboost_model.pkl
+│   └── feature_columns.pkl
+│
+├── frontend/
 │   ├── index.html
 │   ├── app.js
 │   └── style.css
+│
 ├── src/
-│   ├── app.py                     # Flask API + static frontend
-│   ├── predict.py                 # Load model + predict_fare()
-│   └── evaluate.py                # Score model on full CSV
-├── streamlit_app.py               # Optional Streamlit UI
+│   ├── app.py
+│   ├── predict.py
+│   └── evaluate.py
+│
+├── streamlit_app.py
 ├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## Execution flow
+# ⚙ Project Workflow
 
-```
-data/processed_data.csv
+```text
+Processed Dataset
         │
         ▼
-notebooks/01_data_analysis.ipynb     → explore & validate data
+Exploratory Data Analysis
         │
         ▼
-notebooks/02_model_training.ipynb    → train Linear / Ridge / Lasso / OLS / XGBoost
-        │                              → compare metrics
-        │                              → save ONLY to models/xgboost_model.pkl + feature_columns.pkl
-        ▼
-src/predict.py                       → load XGBoost, build feature row, predict
+Train Multiple Models
         │
-        ├──► src/app.py + frontend/  → Flask web app (default)
-        ├──► streamlit_app.py        → Streamlit UI
-        └──► src/evaluate.py         → offline metrics on full dataset
+        ▼
+Compare Performance
+        │
+        ▼
+Save XGBoost Model
+        │
+        ▼
+Prediction API
+        │
+ ┌──────┼───────────┐
+ ▼      ▼           ▼
+Flask  Streamlit  Evaluation
 ```
 
 ---
 
-## Setup
+# 🛠 Installation
+
+Clone the repository
 
 ```bash
-# From project root
-python -m venv .venv
-# Windows
-.venv\Scripts\activate
-# macOS / Linux
-source .venv/bin/activate
+git clone https://github.com/yourusername/fare_prediction.git
 
+cd fare_prediction
+```
+
+Create Virtual Environment
+
+### Windows
+
+```bash
+python -m venv .venv
+
+.venv\Scripts\activate
+```
+
+### macOS/Linux
+
+```bash
+python3 -m venv .venv
+
+source .venv/bin/activate
+```
+
+Install dependencies
+
+```bash
 pip install -r requirements.txt
+
 pip install flask flask-cors streamlit
 ```
 
-> `flask`, `flask-cors`, and `streamlit` are required for the apps; install them if they are not already in your environment.
+---
 
-Ensure the trained artifacts exist:
+# 📦 Required Model Files
 
-- `models/xgboost_model.pkl`
-- `models/feature_columns.pkl`
+Make sure these files exist:
 
-If missing, open `notebooks/02_model_training.ipynb`, run all cells (including **§14 Save Production Model**).
+```text
+models/
+├── xgboost_model.pkl
+└── feature_columns.pkl
+```
+
+If they do not exist:
+
+Open
+
+```
+notebooks/02_model_training.ipynb
+```
+
+Run every cell to generate the trained model.
 
 ---
 
-## Run — Flask + frontend (main app)
+# 🚀 Run Flask Application
 
 ```bash
 python src/app.py
 ```
 
-Open [http://127.0.0.1:5000](http://127.0.0.1:5000).
+Open
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/` | GET | Web UI |
-| `/api/predict` | POST | JSON fare prediction |
-| `/api/health` | GET | Health + model metrics |
-| `/api/reload` | POST | Reload model after retrain |
+```
+http://127.0.0.1:5000
+```
 
-Example predict body:
+---
+
+# 🔗 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | Web Interface |
+| `/api/predict` | POST | Predict Fare |
+| `/api/health` | GET | Model Health |
+| `/api/reload` | POST | Reload Saved Model |
+
+---
+
+# 📥 Sample Prediction Request
 
 ```json
 {
@@ -171,27 +246,64 @@ Example predict body:
 
 ---
 
-## Deploy / run on Streamlit
+# 🌍 Deploy on Render
 
-### Local
+The application is deployed using **Render**.
+
+### Live URL
+
+https://fareprediction-tlzr.onrender.com
+
+### Deployment Steps
+
+1. Push project to GitHub
+2. Login to Render
+3. Create New Web Service
+4. Connect GitHub Repository
+
+Build Command
+
+```bash
+pip install -r requirements.txt
+```
+
+Start Command
+
+```bash
+python src/app.py
+```
+
+For production you can also use
+
+```bash
+gunicorn src.app:app
+```
+
+---
+
+# 💻 Streamlit (Optional)
+
+Run locally
 
 ```bash
 streamlit run streamlit_app.py
 ```
 
-Browser opens at [http://localhost:8501](http://localhost:8501).
+Open
 
-### Streamlit Community Cloud
+```
+http://localhost:8501
+```
 
-1. Push this repo to GitHub (include `models/*.pkl` or train in CI).
-2. Go to [https://share.streamlit.io](https://share.streamlit.io) → **New app**.
-3. Select the repo, branch, and set **Main file path** to `streamlit_app.py`.
-4. Add Python packages in Cloud settings / `requirements.txt` (include `streamlit`, `xgboost`, `scikit-learn`, `pandas`, `joblib`, `numpy`).
-5. Deploy. The app imports `src.predict`, which loads `models/xgboost_model.pkl`.
+---
 
-### Optional Streamlit config
+# ⚙ Optional Streamlit Configuration
 
-Create `.streamlit/config.toml` if you want a fixed port/theme:
+Create
+
+```
+.streamlit/config.toml
+```
 
 ```toml
 [server]
@@ -204,25 +316,7 @@ gatherUsageStats = false
 
 ---
 
-## Deploy / run on Render
-
-The Flask app is live at **[fareprediction-tlzr.onrender.com](https://fareprediction-tlzr.onrender.com)**.
-
-To deploy your own copy:
-
-1. Push this repo to GitHub (include `models/*.pkl` or train in CI).
-2. Go to [https://render.com](https://render.com) → **New** → **Web Service**.
-3. Connect the repo and configure:
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `python src/app.py` (or `gunicorn src.app:app` for production)
-4. Add any needed environment variables in the Render dashboard.
-5. Deploy. Render assigns a public URL like `https://<your-app-name>.onrender.com`.
-
-> Free-tier Render services spin down after inactivity, so the first request after idling may be slow while the instance wakes up.
-
----
-
-## Evaluate the saved model
+# 📈 Evaluate Model
 
 ```bash
 python src/evaluate.py
@@ -230,15 +324,80 @@ python src/evaluate.py
 
 ---
 
-## Retrain workflow
+# 🔄 Retraining Workflow
 
-1. Run `notebooks/02_model_training.ipynb` end-to-end.
-2. Confirm §14 saved files under project-root `models/` (`xgboost_model.pkl` + `feature_columns.pkl` only).
-3. Flask: click **Reload Model** in the UI, or `POST /api/reload`.
-4. Streamlit: restart the app (or rerun) to pick up the new file.
+1. Run
+
+```
+02_model_training.ipynb
+```
+
+2. Save
+
+```
+models/xgboost_model.pkl
+models/feature_columns.pkl
+```
+
+3. Reload Flask model
+
+```
+POST /api/reload
+```
+
+or restart the application.
 
 ---
 
-## License / notes
+# 🛠 Tech Stack
 
-Educational ML project. Model metrics are from the notebook’s 80/20 train-test split (`random_state=42`). Currency in the UI is treated as INR (₹).
+- Python
+- Pandas
+- NumPy
+- Scikit-learn
+- XGBoost
+- Flask
+- Streamlit
+- HTML
+- CSS
+- JavaScript
+- Bootstrap
+- Render
+
+---
+
+# 📷 Screenshots
+
+Add screenshots here.
+
+```
+screenshots/
+├── homepage.png
+├── prediction.png
+├── result.png
+```
+
+---
+
+# 📄 License
+
+This project is developed for educational and portfolio purposes.
+
+The fare values shown are treated as **Indian Rupees (₹)**.
+
+---
+
+# 👨‍💻 Author
+
+**Nilesh Jadhav**
+
+- LinkedIn: https://linkedin.com/in/your-link
+- GitHub: https://github.com/yourusername
+
+---
+
+<div align="center">
+
+### ⭐ If you like this project, don't forget to Star the repository!
+
+</div>
