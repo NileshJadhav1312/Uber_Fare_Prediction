@@ -34,7 +34,7 @@ def health():
     return jsonify({
         "status": "online",
         "model": "XGBoost Regressor",
-        "metrics": {"r2_score": 0.9897, "mae": 128.20, "rmse": 171.11},
+        "metrics": {"r2_score": 0.91, "mae": 128.20, "rmse": 171.11},
     })
 
 
@@ -113,7 +113,7 @@ def predict():
             "predicted_fare": round(predicted_fare, 2),
             "currency": "INR",
             "model_used": "XGBoost Regressor",
-            "r2_accuracy": "98.97%",
+            "r2_accuracy": "91%",
         })
     except Exception as exc:
         return jsonify({"success": False, "error": str(exc)}), 400

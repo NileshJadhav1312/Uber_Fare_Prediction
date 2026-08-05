@@ -45,7 +45,7 @@ The project includes:
 
 | Metric | Score |
 |---------|-------|
-| **R² Score** | **0.9897** |
+| **R² Score** | **0.91** |
 | **MAE** | **₹128.20** |
 | **RMSE** | **₹171.11** |
 
@@ -55,7 +55,7 @@ The project includes:
 
 | Model | Test R² | MAE (₹) | RMSE (₹) | Status |
 |------|------:|------:|------:|------|
-| ✅ XGBoost | **0.9897** | **128.20** | **171.11** | Production |
+| ✅ XGBoost | **0.91** | **128.20** | **171.11** | Production |
 | Ridge Regression | 0.9092 | 349.50 | 506.97 | Comparison |
 | Linear Regression | 0.9092 | 349.80 | 506.98 | Comparison |
 | Multiple Regression (OLS) | 0.9092 | 349.80 | 506.98 | Comparison |

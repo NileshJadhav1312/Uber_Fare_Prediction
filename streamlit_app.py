@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 st.title("UberFare AI")
-st.caption("XGBoost fare predictor · R² ≈ 98.97%")
+st.caption("XGBoost fare predictor · R² ≈ 91%")
 
 try:
     load_xgboost_model()
